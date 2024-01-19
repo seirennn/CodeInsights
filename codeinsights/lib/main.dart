@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
-import 'discussion_page.dart'; // Import the discussion page file
-import 'firebase.dart'; // Import your firebase.dart file
+import 'discussion_page.dart';
+import 'firebase.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   initializeFirebase(); // Initialize Firebase here
   runApp(MyApp());
 }
@@ -14,9 +15,14 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Code Insights',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        brightness: Brightness.dark,
+        primarySwatch: Colors.orange, // Choose an appropriate color from the Gruvbox palette
+        scaffoldBackgroundColor: Color(0xff282828), // Gruvbox background color
+        textTheme: TextTheme(
+          bodyText2: TextStyle(color: Colors.white), // Gruvbox foreground color
+        ),
       ),
-      home: DiscussionPage(), // Set the DiscussionPage as the home screen
+      home: DiscussionPage(),
     );
   }
 }
