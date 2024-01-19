@@ -23,6 +23,7 @@ class MyApp extends StatelessWidget {
         ),
       ),
       home: DiscussionPage(),
+      debugShowCheckedModeBanner: false, // Set to false to remove the Debug banner
     );
   }
 }
