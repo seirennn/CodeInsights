@@ -2,6 +2,8 @@
 
 import 'package:flutter/material.dart';
 
+import 'auth.dart'; // Import your AuthService
+import 'auth_dialog.dart'; // Import the AuthDialog
 import 'post.dart';
 
 class CommentScreen extends StatefulWidget {
@@ -15,6 +17,7 @@ class CommentScreen extends StatefulWidget {
 
 class _CommentScreenState extends State<CommentScreen> {
   TextEditingController _commentController = TextEditingController();
+  final AuthService _auth = AuthService(); // Create an instance of AuthService
 
   @override
   Widget build(BuildContext context) {
@@ -56,12 +59,23 @@ class _CommentScreenState extends State<CommentScreen> {
             SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
-                if (_commentController.text.isNotEmpty) {
-                  Comment newComment = Comment(text: _commentController.text);
-                  setState(() {
-                    widget.post.addComment(newComment);
-                    _commentController.clear();
-                  });
+                if (_auth.currentUser != null) {
+                  // User is logged in, allow commenting
+                  if (_commentController.text.isNotEmpty) {
+                    Comment newComment = Comment(text: _commentController.text);
+                    setState(() {
+                      widget.post.addComment(newComment);
+                      _commentController.clear();
+                    });
+                  }
+                } else {
+                  // User is not logged in, show authentication dialog
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AuthDialog();
+                    },
+                  );
                 }
               },
               child: Text('Add Comment'),

@@ -1,12 +1,11 @@
-// /lib/discussion_page.dart
-
 import 'package:flutter/material.dart';
 
-import 'auth.dart'; // Import your AuthService
+import 'auth.dart';
+import 'auth_dialog.dart';
 import 'comment_screen.dart';
 import 'create_post_screen.dart';
 import 'post.dart';
-import 'sign_in_screen.dart'; // Import the SignInScreen
+import 'sign_in_screen.dart';
 
 class DiscussionPage extends StatefulWidget {
   @override
@@ -14,8 +13,7 @@ class DiscussionPage extends StatefulWidget {
 }
 
 class _DiscussionPageState extends State<DiscussionPage> {
-  final AuthService _auth = AuthService(); // Create an instance of AuthService
-
+  final AuthService _auth = AuthService();
   List<Post> posts = [];
 
   @override
@@ -92,5 +90,14 @@ class _DiscussionPageState extends State<DiscussionPage> {
 
   void _refreshPage() {
     setState(() {});
+  }
+
+  void showAuthDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AuthDialog();
+      },
+    );
   }
 }
