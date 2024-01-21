@@ -1,24 +1,22 @@
 // /lib/post.dart
+import 'comment.dart';
 
 class Post {
   String title;
   String content;
-  List<Comment> comments; // Add a list to store comments
+  String userId;
+  String username;
+  List<Comment> comments;
 
   Post({
     required this.title,
     required this.content,
-    List<Comment>? comments, // Initialize comments with an empty list
+    required this.userId,
+    required this.username,
+    List<Comment>? comments,
   }) : comments = comments ?? [];
 
-  // Add a method to add a new comment to the post
   void addComment(Comment comment) {
     comments.add(comment);
   }
-}
-
-class Comment {
-  String text;
-
-  Comment({required this.text});
 }

@@ -1,5 +1,4 @@
 // /lib/firebase_config.dart
-
 const firebaseConfig = {
   'apiKey': 'AIzaSyBNNhBzISxqg452EzXHAejKNhZGTKr4wC8',
   'authDomain': 'codeinsights-792b1.firebaseapp.com',

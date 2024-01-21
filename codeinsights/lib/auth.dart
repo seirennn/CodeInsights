@@ -1,9 +1,16 @@
-// /lib/auth.dart
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+
+class User {
+  final String uid;
+  final String? username;
+
+  User({required this.uid, this.username});
+}
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<void> signInWithEmailAndPassword(String email, String password) async {
     try {
@@ -16,26 +23,45 @@ class AuthService {
     }
   }
 
-  Future<void> signUpWithEmailAndPassword(String email, String password) async {
+
+  Future<void> signUpWithEmailAndPassword(String email, String password, String username) async {
     try {
-      await _auth.createUserWithEmailAndPassword(
+      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
+
+      String uid = userCredential.user?.uid ?? '';
+      await _createUser(uid, username);
+
     } catch (e) {
       throw FirebaseAuthException(message: e.toString());
     }
   }
 
-  // Add other authentication methods as needed
+  Future<void> _createUser(String uid, String username) async {
+    await _firestore.collection('users').doc(uid).set({
+      'username': username,
+    });
+  }
 
-  // Example: Sign out
   Future<void> signOut() async {
     await _auth.signOut();
   }
 
-  // Example: Get the current user
-  User? get currentUser => _auth.currentUser;
+  Future<String?> getUsername(String uid) async {
+    DocumentSnapshot<Map<String, dynamic>> snapshot =
+        await _firestore.collection('users').doc(uid).get();
+    return snapshot.data()?['username'];
+  }
+
+  User? get currentUser {
+    User? user = _auth.currentUser != null
+        ? User(uid: _auth.currentUser!.uid, username: _auth.currentUser!.displayName)
+        : null;
+
+    return user;
+  }
 }
 
 class FirebaseAuthException implements Exception {
@@ -43,4 +69,3 @@ class FirebaseAuthException implements Exception {
 
   FirebaseAuthException({required this.message});
 }
-

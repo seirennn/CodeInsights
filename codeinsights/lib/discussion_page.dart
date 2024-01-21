@@ -5,7 +5,6 @@ import 'auth_dialog.dart';
 import 'comment_screen.dart';
 import 'create_post_screen.dart';
 import 'post.dart';
-import 'sign_in_screen.dart';
 
 class DiscussionPage extends StatefulWidget {
   @override
@@ -36,13 +35,12 @@ class _DiscussionPageState extends State<DiscussionPage> {
           if (_auth.currentUser == null)
             TextButton(
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => SignInScreen()),
-                ).then((_) => _refreshPage());
+                _auth.currentUser == null ? showAuthDialog(context) : null;
               },
               child: Text(
-                'Sign In',
+                _auth.currentUser == null
+                    ? 'Sign In'
+                    : 'Logged in as ${_auth.currentUser?.username}',
                 style: TextStyle(color: Colors.white),
               ),
             ),
@@ -64,6 +62,7 @@ class _DiscussionPageState extends State<DiscussionPage> {
 
                 if (result != null && result is Post) {
                   setState(() {
+                    result.userId = _auth.currentUser!.uid;
                     posts.add(result);
                   });
                 }
@@ -77,13 +76,32 @@ class _DiscussionPageState extends State<DiscussionPage> {
   Widget buildPostItem(Post post) {
     return ListTile(
       title: Text(post.title),
-      subtitle: Text(post.content),
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(post.content),
+          SizedBox(height: 8), // Add some space between content and username
+          if (post.username != null)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Text(
+                  'Posted by ',
+                ),
+                Text(
+                  post.username!,
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ), // Use post.username
+              ],
+            ),
+        ],
+      ),
       onTap: () async {
         await Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => CommentScreen(post: post)),
         );
-        setState(() {});
+        _refreshPage();
       },
     );
   }
@@ -98,6 +116,6 @@ class _DiscussionPageState extends State<DiscussionPage> {
       builder: (BuildContext context) {
         return AuthDialog();
       },
-    );
+    ).then((_) => _refreshPage());
   }
 }
