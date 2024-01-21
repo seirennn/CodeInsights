@@ -2,9 +2,11 @@
 
 import 'package:flutter/material.dart';
 
-import 'comment_screen.dart'; // Import the CommentScreen
-import 'create_post_screen.dart'; // Import the CreatePostScreen
+import 'auth.dart'; // Import your AuthService
+import 'comment_screen.dart';
+import 'create_post_screen.dart';
 import 'post.dart';
+import 'sign_in_screen.dart'; // Import the SignInScreen
 
 class DiscussionPage extends StatefulWidget {
   @override
@@ -12,6 +14,8 @@ class DiscussionPage extends StatefulWidget {
 }
 
 class _DiscussionPageState extends State<DiscussionPage> {
+  final AuthService _auth = AuthService(); // Create an instance of AuthService
+
   List<Post> posts = [];
 
   @override
@@ -19,6 +23,32 @@ class _DiscussionPageState extends State<DiscussionPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Discussion Page'),
+        actions: [
+          if (_auth.currentUser != null)
+            TextButton(
+              onPressed: () async {
+                await _auth.signOut();
+                _refreshPage();
+              },
+              child: Text(
+                'Logout',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          if (_auth.currentUser == null)
+            TextButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => SignInScreen()),
+                ).then((_) => _refreshPage());
+              },
+              child: Text(
+                'Sign In',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+        ],
       ),
       body: ListView.builder(
         itemCount: posts.length,
@@ -26,21 +56,23 @@ class _DiscussionPageState extends State<DiscussionPage> {
           return buildPostItem(posts[index]);
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          var result = await Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => CreatePostScreen()),
-          );
+      floatingActionButton: _auth.currentUser != null
+          ? FloatingActionButton(
+              onPressed: () async {
+                var result = await Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => CreatePostScreen()),
+                );
 
-          if (result != null && result is Post) {
-            setState(() {
-              posts.add(result);
-            });
-          }
-        },
-        child: Icon(Icons.add),
-      ),
+                if (result != null && result is Post) {
+                  setState(() {
+                    posts.add(result);
+                  });
+                }
+              },
+              child: Icon(Icons.add),
+            )
+          : null,
     );
   }
 
@@ -53,11 +85,12 @@ class _DiscussionPageState extends State<DiscussionPage> {
           context,
           MaterialPageRoute(builder: (context) => CommentScreen(post: post)),
         );
-        setState(() {}); // Refresh the UI after returning from CommentScreen
+        setState(() {});
       },
     );
   }
+
+  void _refreshPage() {
+    setState(() {});
+  }
 }
-
-
-//code by seirennn
